@@ -1,0 +1,56 @@
+experiment:
+  name: echo_r2plus1d_cpu_smoke
+  seed: 42
+  output_dir: outputs/echo_r2plus1d_cpu_smoke
+
+data:
+  csv_path: manifests/301/echo_hfref_smoke_manifest.csv
+  path_col: echo_dcm_path
+  data_root: 301/echo_only_dcm
+  cache_dir: cache/echo_resized_64
+  cache_image_size: 64
+  patient_id_col: subject_id
+  id_col: echo_id
+  label_col: main_label
+  input_format: dicom
+  num_frames: 4
+  image_size: 64
+  target_channels: 3
+  normalize_mean: [0.43216, 0.394666, 0.37645]
+  normalize_std: [0.22803, 0.22145, 0.216989]
+
+augment:
+  crop_scale_range: [1.0, 1.0]
+  brightness_jitter: 0.0
+  contrast_jitter: 0.0
+  translate_fraction: 0.0
+
+cross_validation:
+  split_file: splits/301_echo_smoke_split.csv
+
+model:
+  name: r2plus1d_18
+  pretrained: false
+  pretrained_source: random
+  freeze_mode: partial
+  dropout: 0.2
+  unfreeze_patterns:
+    - "layer4"
+
+training:
+  epochs: 1
+  batch_size: 1
+  num_workers: 0
+  pin_memory: false
+  optimizer: adamw
+  lr_backbone: 1.0e-5
+  lr_head: 3.0e-4
+  weight_decay: 1.0e-4
+  use_pos_weight: false
+  pos_weight_min: 0.5
+  pos_weight_max: 2.0
+  amp: false
+  init_checkpoint: ""
+
+checkpoint:
+  patience: 1

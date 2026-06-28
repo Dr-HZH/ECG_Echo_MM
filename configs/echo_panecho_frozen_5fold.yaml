@@ -1,0 +1,59 @@
+experiment:
+  name: echo_panecho_frozen_5fold
+  seed: 42
+  output_dir: outputs/echo_panecho_frozen_5fold
+
+data:
+  csv_path: manifests/301/echo_hfref_manifest.csv
+  path_col: echo_dcm_path
+  data_root: 301/echo_only_dcm
+  cache_dir: cache/echo_resized_224
+  cache_image_size: 224
+  patient_id_col: subject_id
+  id_col: echo_id
+  label_col: main_label
+  input_format: dicom
+  num_frames: 16
+  image_size: 224
+  target_channels: 3
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+augment:
+  crop_scale_range: [0.9, 1.0]
+  brightness_jitter: 0.05
+  contrast_jitter: 0.05
+  translate_fraction: 0.02
+
+cross_validation:
+  split_file: splits/301_echo_nested_5fold.csv
+
+model:
+  name: panecho
+  pretrained: true
+  pretrained_source: local
+  checkpoint_path: checkpoints/pretrained/panecho.pt
+  freeze_mode: frozen
+  dropout: 0.2
+  unfreeze_patterns: []
+  panecho:
+    repo_path: third_party/PanEcho
+    clip_len: 16
+
+training:
+  epochs: 10
+  batch_size: 4
+  num_workers: 0
+  pin_memory: false
+  optimizer: adamw
+  lr_backbone: 1.0e-5
+  lr_head: 1.0e-3
+  weight_decay: 1.0e-4
+  use_pos_weight: false
+  pos_weight_min: 0.5
+  pos_weight_max: 2.0
+  amp: true
+  init_checkpoint: ""
+
+checkpoint:
+  patience: 3

@@ -1,0 +1,57 @@
+experiment:
+  name: echo_r2plus1d_ft_5fold
+  seed: 42
+  output_dir: outputs/echo_r2plus1d_ft_5fold
+
+data:
+  csv_path: manifests/301/echo_hfref_manifest.csv
+  path_col: echo_dcm_path
+  data_root: 301/echo_only_dcm
+  cache_dir: cache/echo_resized_112
+  cache_image_size: 112
+  patient_id_col: subject_id
+  id_col: echo_id
+  label_col: main_label
+  input_format: dicom
+  num_frames: 16
+  image_size: 112
+  target_channels: 3
+  normalize_mean: [0.43216, 0.394666, 0.37645]
+  normalize_std: [0.22803, 0.22145, 0.216989]
+
+augment:
+  crop_scale_range: [0.9, 1.0]
+  brightness_jitter: 0.05
+  contrast_jitter: 0.05
+  translate_fraction: 0.02
+
+cross_validation:
+  split_file: splits/301_echo_nested_5fold.csv
+
+model:
+  name: r2plus1d_18
+  pretrained: true
+  pretrained_source: local
+  checkpoint_path: checkpoints/pretrained/r2plus1d_18-91a641e6.pth
+  freeze_mode: partial
+  dropout: 0.2
+  unfreeze_patterns:
+    - "layer4"
+
+training:
+  epochs: 20
+  batch_size: 2
+  num_workers: 0
+  pin_memory: false
+  optimizer: adamw
+  lr_backbone: 1.0e-5
+  lr_head: 3.0e-4
+  weight_decay: 1.0e-4
+  use_pos_weight: false
+  pos_weight_min: 0.5
+  pos_weight_max: 2.0
+  amp: true
+  init_checkpoint: ""
+
+checkpoint:
+  patience: 5
