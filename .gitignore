@@ -1,0 +1,36 @@
+# Python/runtime
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local credentials
+.env
+.env.*
+
+# Large medical data and generated caches
+301/
+cache/
+data_h5/
+dcm/
+resolved_csvs/
+third_party/
+checkpoints/
+*.dcm
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+
+# Generated outputs and logs
+outputs/
+logs/
+manifests/
+reports/
+splits/
+*.pid

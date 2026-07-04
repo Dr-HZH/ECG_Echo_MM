@@ -1,0 +1,65 @@
+seed: 42
+device: cuda
+output_dir: outputs/racafuse_from_scratch
+
+data:
+  data_root: .
+  pairs_csv: resolved_csvs/301/multimodal_pairs_relative_resolved.csv
+  echo_manifest: manifests/racafuse_30d_echo_h5_manifest.csv
+  ecg_h5_manifest: manifests/racafuse_30d_ecg_h5_manifest.csv
+  echo_h5_dir: data_h5/racafuse_echo_30d_t16_112_lzf
+  manifest_csv: manifests/racafuse_pairs_30d_h5_manifest.csv
+  split_csv: splits/racafuse_pairs_30d_5fold.csv
+  manifest_summary_json: reports/racafuse_pairs_30d_manifest_summary.json
+  max_days: 30
+  source_label_col: echo_strict_is_ischemic
+
+cv:
+  n_splits: 5
+  inner_val_ratio: 0.1
+
+dataset:
+  echo_num_frames: 16
+  echo_image_size: 112
+  echo_channels: 3
+  echo_intensity_mode: uint8_scale
+  echo_crop_scale_range: [0.90, 1.0]
+  echo_brightness_jitter: 0.04
+  echo_contrast_jitter: 0.08
+  echo_translate_fraction: 0.03
+  echo_normalize_mean: [0.5, 0.5, 0.5]
+  echo_normalize_std: [0.25, 0.25, 0.25]
+  ecg_target_length: 5000
+
+model:
+  ecg_in_channels: 12
+  echo_in_channels: 3
+  embedding_dim: 256
+  ecg_base_channels: 32
+  echo_base_channels: 16
+  dropout: 0.15
+  meta_dim: 3
+
+loader:
+  batch_size: 16
+  num_workers: 2
+  pin_memory: true
+
+train:
+  epochs: 12
+  patience: 4
+  lr: 0.001
+  weight_decay: 0.0001
+  amp: true
+  use_calibrated_loss: true
+
+loss:
+  focal_alpha: 0.5
+  focal_gamma: 2.0
+  use_pos_weight: true
+  lambda_auc: 0.1
+  lambda_brier: 0.05
+  auc_margin: 0.2
+
+eval:
+  use_calibrated: true
